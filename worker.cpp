@@ -25,9 +25,12 @@ void Worker::Stop()
 		return;
 	}
 
-	_thread->join();
-	delete _thread;
-	_thread = NULL;
+	{
+		Request("stop");
+		_thread->join();
+		delete _thread;
+		_thread = NULL;
+	}
 }
 
 bool Worker::Request(const string &req)
@@ -39,6 +42,8 @@ bool Worker::Request(const string &req)
 	std::unique_lock<std::mutex> lk(_mutex);
 	_queue.push(req);
 	_cv.notify_one();
+
+	return true;
 }
 
 void Worker::Process()
@@ -58,6 +63,10 @@ void Worker::Process()
 
 			req = _queue.front();
 			_queue.pop();
+		}
+
+		if (req == "stop") {
+			break;
 		}
 
 		cout << "processing: " << req << endl;

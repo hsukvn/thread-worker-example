@@ -16,6 +16,9 @@ int main()
 	string req;
 	while (true) {
 		cin >> req;
+		if (req == "stop") {
+			break;
+		}
 		w.Request(req);
 	}
 
